@@ -4,6 +4,10 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  roleSelected: {
+    type: Object,
+    required: true,
+  },
 });
 
 const permissions = ref([]);
@@ -11,6 +15,7 @@ const warning = ref(null);
 const success = ref(null);
 const error_exits = ref(null);
 const isLoading = ref(false);
+const name = ref("");
 
 const AddEdidPermissionDialog = (permission) => {
   let index = permissions.value.findIndex((perm) => perm === permission);
@@ -21,7 +26,7 @@ const AddEdidPermissionDialog = (permission) => {
   }
   //   console.log(permissions.value);
 };
-const store = async () => {
+const update = async () => {
   warning.value = null;
   success.value = null;
   error_exits.value = null;
@@ -71,14 +76,16 @@ const store = async () => {
     isLoading.value = false;
   }
 };
-
+onMounted(() => {
+  //   console.log(props.roleSelected);
+  name.value = props.roleSelected.name;
+  permissions.value = props.roleSelected.permissions_pluck;
+});
 const emit = defineEmits([
   "addRole",
   "alert_success",
   "update:isDialogVisible",
 ]);
-
-const name = ref("");
 
 const onFormSubmit = () => {
   emit("update:isDialogVisible", false);
@@ -106,11 +113,11 @@ const dialogVisibleUpdate = (val) => {
 
       <VCardText class="pt-5">
         <div class="text-center pb-6">
-          <h4 class="text-h4 mb-2">Agregar Rol</h4>
+          <h4 class="text-h4 mb-2">Editar Rol: {{ props.roleSelected.id }}</h4>
         </div>
 
         <!-- 👉 Form -->
-        <VForm class="mt-4" @submit.prevent="store">
+        <VForm class="mt-4" @submit.prevent="update">
           <VRow>
             <!-- 👉 First Name -->
             <VCol cols="12">
@@ -171,6 +178,7 @@ const dialogVisibleUpdate = (val) => {
                           style="list-style-type: none"
                         >
                           <VCheckbox
+                            v-model="permissions"
                             :label="permiso.name"
                             :value="permiso.permiso"
                             @click="AddEdidPermissionDialog(permiso.permiso)"

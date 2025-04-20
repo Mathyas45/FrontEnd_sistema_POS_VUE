@@ -45,10 +45,11 @@ export const $api = ofetch.create({
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       setTimeout(() => {
+        alert("Token expirado, por favor inicie sesión nuevamente");
         window.location.reload();
       }, 50);
     }
-
+    let options = response.options;
     if (accessToken) {
       options.headers = {
         ...options.headers,

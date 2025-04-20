@@ -120,6 +120,9 @@ dependencies:
   vue-router:
     specifier: 4.3.2
     version: 4.3.2(vue@3.4.25)
+  vue-toastification:
+    specifier: 2.0.0-rc.5
+    version: 2.0.0-rc.5(vue@3.4.25)
   vue3-apexcharts:
     specifier: 1.5.2
     version: 1.5.2(apexcharts@3.49.0)(vue@3.4.25)
@@ -8305,6 +8308,14 @@ packages:
       shepherd.js: 11.2.0
       vue: 3.4.25(typescript@5.8.2)
     dev: true
+
+  /vue-toastification@2.0.0-rc.5(vue@3.4.25):
+    resolution: {integrity: sha512-q73e5jy6gucEO/U+P48hqX+/qyXDozAGmaGgLFm5tXX4wJBcVsnGp4e/iJqlm9xzHETYOilUuwOUje2Qg1JdwA==}
+    peerDependencies:
+      vue: ^3.0.2
+    dependencies:
+      vue: 3.4.25(typescript@5.8.2)
+    dev: false
 
   /vue3-apexcharts@1.5.2(apexcharts@3.49.0)(vue@3.4.25):
     resolution: {integrity: sha512-rGbgUJDjtsyjfRF0uzwDjzt8+M7ICSRAbm1N9KCDiczW8BSpbEZuaEsJDJYnJuLFIIVXIGilYzIcjNBf6NbeYA==}

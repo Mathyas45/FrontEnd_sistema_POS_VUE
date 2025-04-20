@@ -1,17 +1,23 @@
-import { createApp } from 'vue'
-import App from '@/App.vue'
-import { registerPlugins } from '@core/utils/plugins'
+import { createApp } from "vue";
+import App from "@/App.vue";
+import { registerPlugins } from "@core/utils/plugins";
+import Toast, { POSITION } from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 // Styles
-import '@core/scss/template/index.scss'
-import '@styles/styles.scss'
+import "@core/scss/template/index.scss";
+import "@styles/styles.scss";
 
-// Create vue app
-const app = createApp(App)
+const app = createApp(App);
 
+// Usar Toast en la aplicación
+app.use(Toast, {
+  position: POSITION.TOP_RIGHT,
+  timeout: 3000,
+});
 
 // Register plugins
-registerPlugins(app)
+registerPlugins(app);
 
 // Mount vue app
-app.mount('#app')
+app.mount("#app");
