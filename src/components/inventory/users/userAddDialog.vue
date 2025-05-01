@@ -4,29 +4,25 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-  roleSelected: {
-    type: Object,
-    required: true,
-  },
 });
 
-const permissions = ref([]);
+const name = ref("null");
+const surname = ref("null");
+const email = ref("null");
+const phone = ref("null");
+const type_document = ref("DNI");
+const n_document = ref("null");
+const rol_id = ref("null");
+const sucursal_id = ref("null");
+const gender = ref("null");
+const password = ref("null");
+
 const warning = ref(null);
 const success = ref(null);
 const error_exits = ref(null);
 const isLoading = ref(false);
-const name = ref("");
 
-const AddEdidPermissionDialog = (permission) => {
-  let index = permissions.value.findIndex((perm) => perm === permission);
-  if (index != -1) {
-    permissions.value.splice(index, 1);
-  } else {
-    permissions.value.push(permission);
-  }
-  //   console.log(permissions.value);
-};
-const update = async () => {
+const store = async () => {
   warning.value = null;
   success.value = null;
   error_exits.value = null;
@@ -49,8 +45,8 @@ const update = async () => {
   };
   try {
     isLoading.value = true;
-    const resp = await $api("roles/" + props.roleSelected.id, {
-      method: "PUT",
+    const resp = await $api("users", {
+      method: "POST",
       body: data,
       onResponseError({ response }) {
         error_exits.value = response._data.error;
@@ -60,10 +56,11 @@ const update = async () => {
     if (resp.message == 403) {
       error_exits.value = resp.message_text;
     } else {
-      success.value = "el rol se editó correctamente";
-      emit("editRole", resp.role);
-      emit("alert_success", "el rol se editó correctamente");
+      success.value = "el usuario se creo correctamente";
+      emit("addUser", resp.user);
+      emit("alert_success", "el usuario se creo correctamente");
       onFormReset();
+      name.value = null;
       warning.value = null;
       success.value = null;
       error_exits.value = null;
@@ -74,13 +71,9 @@ const update = async () => {
     isLoading.value = false;
   }
 };
-onMounted(() => {
-  //   console.log(props.roleSelected);
-  name.value = props.roleSelected.name;
-  permissions.value = props.roleSelected.permissions_pluck;
-});
+
 const emit = defineEmits([
-  "editRole",
+  "addUser",
   "alert_success",
   "update:isDialogVisible",
 ]);
@@ -111,18 +104,97 @@ const dialogVisibleUpdate = (val) => {
 
       <VCardText class="pt-5">
         <div class="text-center pb-6">
-          <h4 class="text-h4 mb-2">Editar Rol: {{ props.roleSelected.id }}</h4>
+          <h4 class="text-h4 mb-2">Agregar Usuario</h4>
         </div>
 
         <!-- 👉 Form -->
-        <VForm class="mt-4" @submit.prevent="update">
+        <VForm class="mt-4" @submit.prevent="store">
           <VRow>
             <!-- 👉 First Name -->
-            <VCol cols="12">
+            <VCol cols="6">
               <VTextField
                 v-model="name"
                 label="Nombre"
                 placeholder="Example: Administrador"
+              />
+            </VCol>
+            <VCol cols="6">
+              <VTextField
+                v-model="surname"
+                label="Apellido"
+                placeholder="Example: Tu apellido"
+              />
+            </VCol>
+            <VCol cols="6">
+              <VTextField
+                v-model="email"
+                label="Email"
+                placeholder="Example: Coax@gmail.com"
+              />
+            </VCol>
+            <VCol cols="6">
+              <VTextField
+                v-model="phone"
+                type="number"
+                label="Telefono"
+                placeholder="Example: 123456789"
+              />
+            </VCol>
+            <VCol cols="6">
+              <VSelect
+                :items="['DNI', 'PASAPORTE', 'CARNET DE EXTRANJERIA']"
+                v-model="type_document"
+                label="Tipo de documento"
+                placeholder="Seleccione un tipo de documento"
+                eager
+              />
+            </VCol>
+            <VCol cols="6">
+              <VTextField
+                v-model="n_document"
+                type="number"
+                label="Numero de documento"
+                placeholder="Example: 12345678"
+              />
+            </VCol>
+            <VCol cols="6">
+              <VSelect
+                v-model="rol_id"
+                :items="[]"
+                label="Rol"
+                placeholder="Seleccione un rol"
+                eager
+              />
+            </VCol>
+            <VCol cols="6">
+              <VSelect
+                v-model="sucursal_id"
+                :items="[]"
+                label="Sucursal"
+                placeholder="Seleccione una sucursal"
+                eager
+              />
+            </VCol>
+            <VCol cols="6">
+              <VRadioGroup v-model="gender">
+                <VRadio label="Masculino" value="M" />
+                <VRadio label="Femenino" value="F" />
+              </VRadioGroup>
+            </VCol>
+            <VCol cols="6">
+              <VFileInput
+                label="Foto de perfil"
+                placeholder="Seleccione una foto del usuario"
+                accept="image/*"
+                show-size
+              />
+            </VCol>
+            <VCol cols="6">
+              <VTextField
+                v-model="password"
+                type="password"
+                label="Contraseña"
+                placeholder="Example: Tu contraseña"
               />
             </VCol>
             <VCol cols="12" v-if="warning">
@@ -155,43 +227,11 @@ const dialogVisibleUpdate = (val) => {
                 {{ error_exits }}
               </VAlert>
             </VCol>
-            <VCol cols="12">
-              <VTable>
-                <thead>
-                  <tr>
-                    <th class="text-uppercase">Modulo</th>
-                    <th class="text-uppercase">Permisos</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(item, index) in PERMISOS" :key="index.dessert">
-                    <td>
-                      {{ item.name }}
-                    </td>
-                    <td>
-                      <ul>
-                        <li
-                          v-for="(permiso, index2) in item.permisos"
-                          :key="index2"
-                          style="list-style-type: none"
-                        >
-                          <VCheckbox
-                            v-model="permissions"
-                            :label="permiso.name"
-                            :value="permiso.permiso"
-                            @click="AddEdidPermissionDialog(permiso.permiso)"
-                          />
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </VTable>
-            </VCol>
+            <VCol cols="12"> </VCol>
 
             <VCol cols="12" class="d-flex flex-wrap justify-center gap-4">
               <VBtn :loading="isLoading" :disabled="isLoading" type="submit">
-                Editar
+                Guardar
               </VBtn>
 
               <VBtn color="secondary" variant="outlined" @click="onFormReset">

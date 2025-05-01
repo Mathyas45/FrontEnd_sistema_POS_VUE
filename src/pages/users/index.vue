@@ -5,16 +5,20 @@ const toast = useToast();
 const data = ref([]);
 const headers = [
   { title: "ID", key: "id" },
-  { title: "Rol", key: "name" },
+  { title: "Nombre completo", key: "full_name" },
+  { title: "Email", key: "email" },
+  { title: "Rol", key: "role" },
+  { title: "Sucursal", key: "sucursal" },
+  { title: "Telefono", key: "phone" },
+  { title: "Estado", key: "reg_estado" },
   { title: "Fecha de registro", key: "created_at" },
-  { title: "Permisos", key: "permissions_pluck" },
   { title: "Action", key: "action" },
 ];
 
-const isRolesAddDialogVisible = ref(false);
+const isUserAddDialogVisible = ref(false);
 const isRolesEditDialogVisible = ref(false);
 const isRolesDeleteDialogVisible = ref(false);
-const list_roles = ref([]);
+const list_users = ref([]);
 const cargar = ref(false);
 const searchQuery = ref(null);
 const role_selected_edit = ref(null);
@@ -24,7 +28,7 @@ const list = async () => {
   try {
     cargar.value = true;
     const resp = await $api(
-      "roles?search=" + (searchQuery.value ? searchQuery.value : ""),
+      "users?search=" + (searchQuery.value ? searchQuery.value : ""),
       {
         method: "GET",
         onResponseError({ response }) {
@@ -32,8 +36,8 @@ const list = async () => {
         },
       }
     );
-    // console.log(resp);
-    list_roles.value = resp.roles;
+    console.log(resp);
+    list_users.value = resp.users;
   } catch (error) {
     console.error(error);
   } finally {
@@ -46,35 +50,35 @@ onMounted(() => {
 //captar el evento de agregar un nuevo desde el modal
 const addNewRole = (NewRole) => {
   // console.log(NewRole);
-  let backup = list_roles.value;
-  list_roles.value = [];
+  let backup = list_users.value;
+  list_users.value = [];
   backup.unshift(NewRole);
   setTimeout(() => {
-    list_roles.value = backup;
+    list_users.value = backup;
   }, 50);
 };
 const addEditRole = (editRole) => {
   // console.log(editRole);
-  let backup = list_roles.value;
-  list_roles.value = [];
+  let backup = list_users.value;
+  list_users.value = [];
   let index = backup.findIndex((rol) => rol.id == editRole.id);
   if (index != -1) {
     backup[index] = editRole;
   }
   setTimeout(() => {
-    list_roles.value = backup;
+    list_users.value = backup;
   }, 50);
 };
 const deleteRole = (role) => {
   // console.log(role);
-  let backup = list_roles.value;
-  list_roles.value = [];
+  let backup = list_users.value;
+  list_users.value = [];
   let index = backup.findIndex((rol) => rol.id == role.id);
   if (index != -1) {
     backup.splice(index, 1);
   }
   setTimeout(() => {
-    list_roles.value = backup;
+    list_users.value = backup;
   }, 50);
 };
 
@@ -95,7 +99,7 @@ const deleteItem = (item) => {
 
 <template>
   <div>
-    <VCard title="🔐 Roles y permisos">
+    <VCard title="🙋‍♂️ Usuarios">
       <VCardText>
         <VRow>
           <VCol cols="12" md="6">
@@ -110,10 +114,10 @@ const deleteItem = (item) => {
           </VCol>
           <VCol cols="12" md="6" class="text-end">
             <VBtn
-              @click="isRolesAddDialogVisible = !isRolesAddDialogVisible"
+              @click="isUserAddDialogVisible = !isUserAddDialogVisible"
               class="mb-2"
             >
-              Crear nuevo rol <VIcon end icon="ri-add-circle-fill" />
+              Crear nuevo Usuario <VIcon end icon="ri-add-circle-fill" />
             </VBtn>
           </VCol>
         </VRow>
@@ -121,7 +125,7 @@ const deleteItem = (item) => {
 
       <VDataTable
         :headers="headers"
-        :items="list_roles"
+        :items="list_users"
         :cargar="cargar"
         :items-per-page="20"
         class="text-no-wrap"
@@ -135,15 +139,16 @@ const deleteItem = (item) => {
         <template v-slot:item-id="{ item }">
           <span class="text-h6">{{ item.id }}</span>
         </template>
-        <template v-slot:item.permissions_pluck="{ item }">
-          <ul>
-            <li
-              v-for="(permission, index) in item.permissions_pluck"
-              :key="index"
-            >
-              {{ permission }}
-            </li>
-          </ul>
+        <template v-slot:item.role="{ item }">
+          <span class="text-h6">{{ item.role }}</span>
+        </template>
+        <template v-slot:item.sucursal="{ item }">
+          <span class="text-h6">{{ item.sucursal }}</span>
+        </template>
+        <template v-slot:item.reg_estado="{ item }">
+          <span class="text-h6">{{
+            (item.reg_estado = 1 ? "Activo" : "Editado")
+          }}</span>
         </template>
         <template v-slot:item.action="{ item }">
           <div class="d-flex gap-1">
@@ -157,12 +162,12 @@ const deleteItem = (item) => {
         </template>
       </VDataTable>
     </VCard>
-    <RoleAddDialog
-      v-model:isDialogVisible="isRolesAddDialogVisible"
+    <UserAddDialog
+      v-model:isDialogVisible="isUserAddDialogVisible"
       @addRole="addNewRole"
       @alert_success="alert_success"
     />
-    <RoleEditDialog
+    <!-- <RoleEditDialog
       v-if="role_selected_edit && isRolesEditDialogVisible"
       v-model:isDialogVisible="isRolesEditDialogVisible"
       :roleSelected="role_selected_edit"
@@ -175,6 +180,6 @@ const deleteItem = (item) => {
       :roleSelected="role_selected_delete"
       @deleteRole="deleteRole"
       @alert_success="alert_success"
-    />
+    /> -->
   </div>
 </template>
